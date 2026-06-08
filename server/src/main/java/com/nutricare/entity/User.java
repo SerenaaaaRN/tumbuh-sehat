@@ -8,12 +8,19 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 
-
+/**
+ * Entity User — tabel "users"
+ *
+ * Menggunakan CUID (String) sebagai primary key,
+ * lebih aman dari integer sequential karena tidak bisa ditebak.
+ *
+ * wallet_address diisi hanya untuk role MEDIC & POSYANDU
+ * yang berhak menerbitkan Verifiable Credential (VC) on-chain.
+ */
 @Entity
 @Table(name = "users")
 @Data
@@ -22,29 +29,48 @@ import java.util.UUID;
 public class User implements UserDetails {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @Column(length = 30)
+    private String id; // CUID — di-generate di service sebelum save
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 255)
     private String email;
 
-    @Column(nullable = false)
-    private String password;
+    @Column(name = "password_hash", nullable = false, length = 255)
+    private String passwordHash; // BCrypt hash
 
-    @Column(nullable = false)
-    private String fullName;
-
-    private String phoneNumber;
+    @Column(nullable = false, length = 100)
+    private String name;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Role role = Role.USER;
+    @Column(nullable = false, columnDefinition = "role_enum")
+    private Role role = Role.PARENT;
 
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    // Hanya diisi untuk MEDIC & POSYANDU (Ethereum address, 42 karakter)
+    @Column(name = "wallet_address", unique = true, length = 42)
+    private String walletAddress;
 
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    @Column(name = "is_active", nullable = false)
+    private Boolean isActive = true;
 
+    @Column(name = "created_at", nullable = false, updatable = false,
+            columnDefinition = "TIMESTAMPTZ DEFAULT now()")
+    private OffsetDateTime createdAt = OffsetDateTime.now();
+
+    @Column(name = "updated_at", nullable = false,
+            columnDefinition = "TIMESTAMPTZ DEFAULT now()")
+    private OffsetDateTime updatedAt = OffsetDateTime.now();
+
+    // ── Relasi ────────────────────────────────────────────────────────────────
+
+    // Satu user bisa punya banyak anak
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Child> children;
+
+    // VC yang diterbitkan oleh user ini (jika role MEDIC)
+    @OneToMany(mappedBy = "issuer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<VerifiableCredential> issuedCredentials;
+
+    // ── UserDetails (Spring Security) ─────────────────────────────────────────
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -52,24 +78,22 @@ public class User implements UserDetails {
     }
 
     @Override
-    public String getUsername() {
-        return email;
-    }
+    public String getPassword() { return passwordHash; }
 
     @Override
-    public boolean isAccountNonExpired()  { return true; }
-    @Override
-    public boolean isAccountNonLocked()   { return true; }
-    @Override
-    public boolean isCredentialsNonExpired() { return true; }
-    @Override
-    public boolean isEnabled()            { return true; }
+    public String getUsername() { return email; }
 
-  
+    @Override public boolean isAccountNonExpired()     { return true; }
+    @Override public boolean isAccountNonLocked()      { return isActive; }
+    @Override public boolean isCredentialsNonExpired() { return true; }
+    @Override public boolean isEnabled()               { return isActive; }
+
+    // ── Enum Role ─────────────────────────────────────────────────────────────
 
     public enum Role {
-        USER,       // Orang tua / wali
-        HEALTH_WORKER, // Tenaga kesehatan
+        PARENT,    // Orang tua
+        MEDIC,     // Dokter / bidan
+        POSYANDU,  // Kader posyandu
         ADMIN
     }
 }
