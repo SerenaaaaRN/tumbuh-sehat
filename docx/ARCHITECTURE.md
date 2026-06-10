@@ -75,9 +75,9 @@ Platform ini terdiri dari **3 service utama** yang berkomunikasi via REST API, d
 server/
 ├── src/
 │   ├── main/
-│   │   ├── java/com/stuntingai/
+│   │   ├── java/com/nutricare/
 │   │   │   │
-│   │   │   ├── StuntingAiApplication.java          # Entry point
+│   │   │   ├── nutricareApplication.java          # Entry point
 │   │   │   │
 │   │   │   ├── config/
 │   │   │   │   ├── SecurityConfig.java             # Spring Security bean, filter chain
@@ -99,7 +99,7 @@ server/
 │   │   │   │   │   ├── AnchorStatus.java           # PENDING, CONFIRMED, PENDING_GAS, FAILED
 │   │   │   │   │   └── VcType.java                 # IMMUNIZATION_COMPLETE, NUTRITION_STATUS, GROWTH_MILESTONE
 │   │   │   │   │
-│   │   │   │   └── entities/
+│   │   │   │   └── entity/
 │   │   │   │       ├── User.java                   # @Entity users (+ wallet_address)
 │   │   │   │       ├── Child.java                  # @Entity children (+ anon_id)
 │   │   │   │       ├── Assessment.java             # @Entity assessments
@@ -226,7 +226,7 @@ server/
 │   │               └── V12__create_verifiable_credentials.sql
 │   │
 │   └── test/
-│       └── java/com/stuntingai/
+│       └── java/com/nutricare/
 │           ├── service/
 │           │   ├── AuthServiceTest.java
 │           │   ├── ZScoreCalculatorTest.java

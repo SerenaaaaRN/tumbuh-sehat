@@ -1,4 +1,4 @@
-package com.nutricare.entity;
+package com.nutricare.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
