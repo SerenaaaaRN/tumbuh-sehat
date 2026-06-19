@@ -77,13 +77,11 @@ server/
 │   ├── main/
 │   │   ├── java/com/nutricare/
 │   │   │   │
-│   │   │   ├── nutricareApplication.java          # Entry point
+│   │   │   ├── NutricareApplication.java          # Entry point (@EnableAsync, @EnableScheduling)
 │   │   │   │
 │   │   │   ├── config/
-│   │   │   │   ├── SecurityConfig.java             # Spring Security bean, filter chain
-│   │   │   │   ├── CorsConfig.java                 # CORS allowed origins
-│   │   │   │   ├── JpaConfig.java                  # Auditing, datasource config
-│   │   │   │   └── GeminiConfig.java               # Gemini client bean
+│   │   │   │   ├── SecurityConfig.java             # Spring Security + CORS + method security
+│   │   │   │   └── AppConfig.java                  # WebClient, ObjectMapper (pengganti CorsConfig, JpaConfig, GeminiConfig)
 │   │   │   │
 │   │   │   ├── security/
 │   │   │   │   ├── JwtUtil.java                    # Generate, validate, parse JWT
@@ -144,8 +142,7 @@ server/
 │   │   │   │   │
 │   │   │   │   └── response/
 │   │   │   │       ├── auth/
-│   │   │   │       │   ├── AuthResponse.java       # { accessToken, refreshToken, user }
-│   │   │   │       │   └── UserResponse.java
+│   │   │   │       │   └── AuthResponse.java       # { accessToken, refreshToken, user }
 │   │   │   │       ├── child/
 │   │   │   │       │   └── ChildResponse.java
 │   │   │   │       ├── assessment/
@@ -179,23 +176,24 @@ server/
 │   │   │   │   └── VcController.java               # /api/vc/**, /api/verify
 │   │   │   │
 │   │   │   ├── service/
-│   │   │   │   ├── AuthService.java
-│   │   │   │   ├── ChildService.java
-│   │   │   │   ├── AssessmentService.java
-│   │   │   │   ├── PredictionService.java          # Hitung z-score + call Gemini
-│   │   │   │   ├── NutritionService.java           # Upload storage + Gemini Vision
-│   │   │   │   ├── ChatService.java
-│   │   │   │   ├── ReportService.java              # Generate PDF
-│   │   │   │   ├── StorageService.java             # Supabase Storage REST client
-│   │   │   │   ├── GeminiService.java              # Wrapper Gemini API calls
-│   │   │   │   ├── BlockchainService.java          # Web3j — anchor & verify ke Polygon
-│   │   │   │   ├── VcService.java                  # Issue, revoke, verify VC
-│   │   │   │   └── IpfsService.java                # Pinata client — upload & pin JSON
+│   │   │   │   └── impl/
+│   │   │   │       ├── AuthService.java
+│   │   │   │       ├── ChildService.java
+│   │   │   │       ├── AssessmentService.java
+│   │   │   │       ├── PredictionService.java          # Hitung z-score + call Gemini
+│   │   │   │       ├── NutritionService.java           # Upload storage + Gemini Vision
+│   │   │   │       ├── ChatService.java
+│   │   │   │       ├── ReportService.java              # Generate PDF
+│   │   │   │       ├── StorageService.java             # Supabase Storage REST client
+│   │   │   │       ├── GeminiService.java              # Wrapper Gemini API calls
+│   │   │   │       ├── BlockchainService.java          # Web3j — anchor & verify ke Polygon
+│   │   │   │       ├── VcService.java                  # Issue, revoke, verify VC
+│   │   │   │       └── IpfsService.java                # Pinata client — upload & pin JSON
 │   │   │   │
 │   │   │   ├── util/
 │   │   │   │   ├── ZScoreCalculator.java           # Kalkulasi z-score standar WHO
-│   │   │   │   ├── PromptBuilder.java              # Builder untuk prompt Gemini
 │   │   │   │   └── CuidGenerator.java             # Generate CUID untuk PK
+│   │   │   │   # PromptBuilder blm ada — prompt masih inline di PredictionService
 │   │   │   │
 │   │   │   └── exception/
 │   │   │       ├── GlobalExceptionHandler.java     # @ControllerAdvice
@@ -204,14 +202,15 @@ server/
 │   │   │       ├── DuplicateResourceException.java # 409
 │   │   │       ├── GeminiException.java            # AI-related errors
 │   │   │       ├── BlockchainException.java        # RPC timeout, revert, gas insufficient
-│   │   │       └── VcException.java                # VC already revoked, invalid issuer
+│   │   │       ├── StorageException.java           # Upload/download Supabase Storage
+│   │   │       └── VcException.java                # 🔜 VC already revoked, invalid issuer
 │   │   │
 │   │   └── resources/
-│   │       ├── application.yml                     # Config utama
-│   │       ├── application-dev.yml                 # Override untuk dev
-│   │       ├── application-prod.yml                # Override untuk prod
+│   │       ├── application.properties              # Config utama (port 8080)
+│   │       ├── application-dev.yml                 # 🔜 Override untuk dev
+│   │       ├── application-prod.yml                # 🔜 Override untuk prod
 │   │       └── db/
-│   │           └── migration/                      # Flyway migration files
+│   │           └── migration/                      # 🔜 Flyway migration files
 │   │               ├── V1__create_enums.sql
 │   │               ├── V2__create_users.sql
 │   │               ├── V3__create_children.sql
