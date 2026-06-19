@@ -1,11 +1,12 @@
 package com.nutricare.domain.entity;
 
-
+import com.nutricare.domain.enums.PredictionStatus;
+import com.nutricare.domain.enums.StuntStatus;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -56,6 +57,7 @@ public class Prediction {
     @Enumerated(EnumType.STRING)
     @Column(name = "prediction_status", nullable = false,
             columnDefinition = "prediction_status_enum")
+    @Builder.Default
     private PredictionStatus predictionStatus = PredictionStatus.PENDING;
 
     // ── Z-SCORE (Standar WHO) ──────────────────────────────────────────────────
@@ -98,10 +100,12 @@ public class Prediction {
 
     @Column(name = "created_at", nullable = false, updatable = false,
             columnDefinition = "TIMESTAMPTZ DEFAULT now()")
+    @Builder.Default
     private OffsetDateTime createdAt = OffsetDateTime.now();
 
     @Column(name = "updated_at", nullable = false,
             columnDefinition = "TIMESTAMPTZ DEFAULT now()")
+    @Builder.Default
     private OffsetDateTime updatedAt = OffsetDateTime.now();
 
     // ── Relasi ────────────────────────────────────────────────────────────────
@@ -110,18 +114,4 @@ public class Prediction {
     @OneToOne(mappedBy = "prediction", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private ChatSession chatSession;
 
-    // ── Enum ──────────────────────────────────────────────────────────────────
-
-    public enum StuntStatus {
-        NORMAL,
-        AT_RISK,
-        STUNTED,
-        SEVERELY_STUNTED
-    }
-
-    public enum PredictionStatus {
-        PENDING,    // Menunggu proses Gemini
-        COMPLETED,  // Prediksi berhasil
-        FAILED      // Gemini gagal setelah retry
-    }
 }

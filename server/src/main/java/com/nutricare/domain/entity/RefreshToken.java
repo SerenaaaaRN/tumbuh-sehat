@@ -2,6 +2,7 @@ package com.nutricare.domain.entity;
 
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -26,6 +27,7 @@ import java.time.OffsetDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class RefreshToken {
 
     @Id
@@ -48,10 +50,12 @@ public class RefreshToken {
 
     // True jika token sudah direvoke (logout / sudah dipakai refresh)
     @Column(nullable = false)
+    @Builder.Default
     private Boolean revoked = false;
 
     @Column(name = "created_at", nullable = false, updatable = false,
             columnDefinition = "TIMESTAMPTZ DEFAULT now()")
+    @Builder.Default
     private OffsetDateTime createdAt = OffsetDateTime.now();
 
     // ── Helper method ─────────────────────────────────────────────────────────

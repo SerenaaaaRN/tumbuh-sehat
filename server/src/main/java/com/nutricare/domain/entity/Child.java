@@ -1,7 +1,8 @@
 package com.nutricare.domain.entity;
 
-
+import com.nutricare.domain.enums.Gender;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -24,6 +25,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Child {
 
     @Id
@@ -51,10 +53,12 @@ public class Child {
 
     @Column(name = "created_at", nullable = false, updatable = false,
             columnDefinition = "TIMESTAMPTZ DEFAULT now()")
+    @Builder.Default
     private OffsetDateTime createdAt = OffsetDateTime.now();
 
     @Column(name = "updated_at", nullable = false,
             columnDefinition = "TIMESTAMPTZ DEFAULT now()")
+    @Builder.Default
     private OffsetDateTime updatedAt = OffsetDateTime.now();
 
     // ── Relasi ────────────────────────────────────────────────────────────────
@@ -71,9 +75,4 @@ public class Child {
     @OneToMany(mappedBy = "child", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<VerifiableCredential> verifiableCredentials;
 
-    // ── Enum Gender ───────────────────────────────────────────────────────────
-
-    public enum Gender {
-        MALE, FEMALE
-    }
 }

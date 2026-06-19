@@ -10,6 +10,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.nutricare.domain.enums.Role;
 import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -46,21 +47,25 @@ public class User implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, columnDefinition = "role_enum")
-    private Role role = Role.PARENT; // Mengacu langsung ke file Role.java di folder yang sama
+    @Builder.Default
+    private Role role = Role.PARENT;
 
     // Hanya diisi untuk MEDIC & POSYANDU (Ethereum address, 42 karakter)
     @Column(name = "wallet_address", unique = true, length = 42)
     private String walletAddress;
 
     @Column(name = "is_active", nullable = false)
+    @Builder.Default
     private Boolean isActive = true;
 
     @Column(name = "created_at", nullable = false, updatable = false,
             columnDefinition = "TIMESTAMPTZ DEFAULT now()")
+    @Builder.Default
     private OffsetDateTime createdAt = OffsetDateTime.now();
 
     @Column(name = "updated_at", nullable = false,
             columnDefinition = "TIMESTAMPTZ DEFAULT now()")
+    @Builder.Default
     private OffsetDateTime updatedAt = OffsetDateTime.now();
 
     // ── Relasi ────────────────────────────────────────────────────────────────
@@ -90,6 +95,4 @@ public class User implements UserDetails {
     @Override public boolean isAccountNonLocked()      { return isActive; }
     @Override public boolean isCredentialsNonExpired() { return true; }
     @Override public boolean isEnabled()               { return isActive; }
-
-    // FIX: "public enum Role" yang menduplikasi file Role.java sudah dihapus dari sini!
 }

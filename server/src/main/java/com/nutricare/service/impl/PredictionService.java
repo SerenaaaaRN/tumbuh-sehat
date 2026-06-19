@@ -1,5 +1,6 @@
 package com.nutricare.service.impl;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nutricare.domain.entity.Assessment;
@@ -168,11 +169,14 @@ public class PredictionService {
             JsonNode parsed = objectMapper.readTree(cleanJson);
 
             String summary = parsed.path("summary").asText();
-            String recommendationsJson = parsed.path("recommendations").toString();
+            List<String> recommendationsList = objectMapper.convertValue(
+                parsed.path("recommendations"),
+                new TypeReference<List<String>>() {}
+            );
             String nextDateStr = parsed.path("nextAssessmentDate").asText();
 
             prediction.setSummary(summary);
-            prediction.setRecommendations(recommendationsJson);
+            prediction.setRecommendations(recommendationsList);
             prediction.setGeminiRaw(geminiResponse);
             prediction.setPredictionStatus(PredictionStatus.COMPLETED);
 

@@ -1,6 +1,7 @@
 package com.nutricare.domain.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -27,6 +28,7 @@ import java.time.OffsetDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Assessment {
 
     @Id
@@ -73,6 +75,7 @@ public class Assessment {
     // Tidak ada updated_at — assessment IMMUTABLE setelah insert
     @Column(name = "created_at", nullable = false, updatable = false,
             columnDefinition = "TIMESTAMPTZ DEFAULT now()")
+    @Builder.Default
     private OffsetDateTime createdAt = OffsetDateTime.now();
 
     // ── Relasi ────────────────────────────────────────────────────────────────

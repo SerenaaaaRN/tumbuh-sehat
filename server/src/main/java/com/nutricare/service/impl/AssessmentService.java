@@ -1,6 +1,6 @@
 package com.nutricare.service.impl;
 
-import com.nutricare.domain.entities.*;
+import com.nutricare.domain.entity.*;
 import com.nutricare.domain.enums.PredictionStatus;
 import com.nutricare.domain.enums.StuntStatus;
 import com.nutricare.dto.request.assessment.AssessmentRequest;
@@ -12,10 +12,8 @@ import com.nutricare.util.CuidGenerator;
 import com.nutricare.util.ZScoreCalculator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +22,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * AssessmentService — Phase 3

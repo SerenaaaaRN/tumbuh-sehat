@@ -1,7 +1,8 @@
 package com.nutricare.domain.entity;
 
-
+import com.nutricare.domain.enums.AnchorStatus;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -26,6 +27,7 @@ import java.time.OffsetDateTime;
 @Entity
 @Table(name = "blockchain_anchors")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class BlockchainAnchor {
@@ -60,18 +62,12 @@ public class BlockchainAnchor {
     @Enumerated(EnumType.STRING)
     @Column(name = "anchor_status", nullable = false,
             columnDefinition = "anchor_status_enum")
+    @Builder.Default
     private AnchorStatus anchorStatus = AnchorStatus.PENDING;
 
     @Column(name = "anchored_at", nullable = false, updatable = false,
             columnDefinition = "TIMESTAMPTZ DEFAULT now()")
+    @Builder.Default
     private OffsetDateTime anchoredAt = OffsetDateTime.now();
 
-    // ── Enum ──────────────────────────────────────────────────────────────────
-
-    public enum AnchorStatus {
-        PENDING,      // Menunggu konfirmasi tx
-        CONFIRMED,    // Tx terkonfirmasi di chain
-        PENDING_GAS,  // Saldo MATIC tidak cukup, menunggu top-up
-        FAILED        // Gagal setelah retry maksimum
-    }
 }

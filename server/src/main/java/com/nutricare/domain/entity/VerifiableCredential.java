@@ -1,7 +1,8 @@
 package com.nutricare.domain.entity;
 
-
+import com.nutricare.domain.enums.VcType;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -31,6 +32,7 @@ import java.time.OffsetDateTime;
 @Entity
 @Table(name = "verifiable_credentials")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class VerifiableCredential {
@@ -66,6 +68,7 @@ public class VerifiableCredential {
     // ── STATUS REVOKASI ───────────────────────────────────────────────────────
 
     @Column(name = "is_revoked", nullable = false)
+    @Builder.Default
     private Boolean isRevoked = false;
 
     // TX hash saat VC direvoke on-chain — null jika belum direvoke
@@ -78,6 +81,7 @@ public class VerifiableCredential {
 
     @Column(name = "created_at", nullable = false, updatable = false,
             columnDefinition = "TIMESTAMPTZ DEFAULT now()")
+    @Builder.Default
     private OffsetDateTime createdAt = OffsetDateTime.now();
 
     // ── Helper ────────────────────────────────────────────────────────────────
@@ -86,13 +90,5 @@ public class VerifiableCredential {
         if (isRevoked) return false;
         if (expiresAt != null && OffsetDateTime.now().isAfter(expiresAt)) return false;
         return true;
-    }
-
-    // ── Enum ──────────────────────────────────────────────────────────────────
-
-    public enum VcType {
-        IMMUNIZATION_COMPLETE,  // Bukti imunisasi lengkap
-        NUTRITION_STATUS,       // Status gizi anak
-        GROWTH_MILESTONE        // Capaian tumbuh kembang
     }
 }
