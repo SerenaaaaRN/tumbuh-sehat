@@ -1,48 +1,65 @@
-import React, { useEffect, useState } from "react";
-import { ActivityIndicator, Text, View } from "react-native";
+import React, { useEffect, useState, useRef } from "react";
+import { ActivityIndicator, Text, View, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Animated from "react-native-reanimated";
-import { router } from "expo-router";
-import { useNutritionStore } from "@/stores/nutritionStore";
+import { router, useLocalSearchParams } from "expo-router";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { useBounceAnimation } from "@/hooks/useBounceAnimation";
+import { useUploadNutrition } from "@/features/nutrition/hooks/useNutrition";
 
 const STEPS = [
   "Menganalisis gambar makanan si kecil...",
-  "Mengidentifikasi bahan makanan (Salmon, Wortel, Beras Merah)...",
+  "Mengidentifikasi bahan makanan dengan AI...",
   "Menghitung kalori dan komposisi makronutrisi...",
   "Menyimpan data log gizi ke akun...",
 ];
 
 export const AnalysisScreen = () => {
   const [currentStep, setCurrentStep] = useState(0);
-  const addLog = useNutritionStore((s) => s.addLog);
   const animatedIconStyle = useBounceAnimation();
+  const { childId, imageUri } = useLocalSearchParams<{ childId: string; imageUri: string }>();
+  const uploadNutrition = useUploadNutrition(childId ?? "");
+  const mutationRef = useRef(false);
 
   useEffect(() => {
-    if (currentStep < STEPS.length) {
+    // Start mutation only once
+    if (!mutationRef.current && childId && imageUri) {
+      mutationRef.current = true;
+
+      const processImage = async () => {
+        try {
+          await uploadNutrition.mutateAsync({
+            childId,
+            photo: {
+              uri: imageUri,
+              name: "scan.jpg",
+              type: "image/jpeg",
+            }
+          });
+          setCurrentStep(STEPS.length);
+          // Wait a bit before redirecting so user sees completion
+          setTimeout(() => {
+            router.replace("/(app)/(tabs)/scanner" as any);
+          }, 800);
+        } catch (error) {
+          Alert.alert("Error", "Gagal menganalisis foto makanan.");
+          router.replace("/(app)/(tabs)/scanner" as any);
+        }
+      };
+
+      void processImage();
+    }
+  }, [childId, imageUri, uploadNutrition]);
+
+  useEffect(() => {
+    // Artificial step progression for UX
+    if (uploadNutrition.isPending && currentStep < STEPS.length - 1) {
       const timer = setTimeout(() => {
         setCurrentStep((prev) => prev + 1);
-      }, 1200);
+      }, 1500); // Progress steps while waiting
       return () => clearTimeout(timer);
-    } else {
-      // Completed, add mock record and redirect
-      addLog({
-        childId: "child_001",
-        photoUrl: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=240&auto=format&fit=crop",
-        foodDetected: ["Bubur Salmon", "Beras Merah", "Wortel"],
-        portionEstimate: "Porsi Sedang (~200g)",
-        calories: 145,
-        protein: 6.5,
-        fat: 4.0,
-        carbs: 21.0,
-        fiber: 2.2,
-        adequacyNote: "Sangat baik untuk pemenuhan gizi protein dan omega-3 makan siang anak.",
-        mpasiRecommendation: "Tambahkan porsi lemak sehat seperti 1 sdt minyak zaitun.",
-      });
-      router.replace("/(app)/(tabs)/scanner" as any);
     }
-  }, [currentStep, addLog]);
+  }, [currentStep, uploadNutrition.isPending]);
 
   return (
     <SafeAreaView className="flex-1 bg-background items-center justify-center px-6">

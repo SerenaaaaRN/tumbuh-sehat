@@ -79,17 +79,17 @@ Ganti hardcoded chart data dengan visualisasi berbasis data assessment nyata & z
 Ganti scanner simulasi dengan kamera nyata + upload multipart, sambungkan history ke API.
 
 ### Tasks
-| ID | Task | Complexity |
-|----|------|------------|
-| S3.1 | Install dependency kamera compatible Expo SDK 54 | M |
-| S3.2 | Permission handling kamera/gallery | M |
-| S3.3 | Ganti viewfinder simulasi dengan camera preview | L |
-| S3.4 | Implement multipart upload di service | M |
-| S3.5 | Integrasikan `useUploadNutritionPhoto` | M |
-| S3.6 | AnalysisScreen pakai data dari query cache | M |
-| S3.7 | Load nutrition history real API | M |
-| S3.8 | Empty/loading/error state history | S |
-| S3.9 | Ekstrak card/tag UI | S |
+| ID | Task | Complexity | Status |
+|----|------|------------|--------|
+| S3.1 | Install dependency kamera compatible Expo SDK 54 | M | ✅ |
+| S3.2 | Permission handling kamera/gallery | M | ✅ |
+| S3.3 | Ganti viewfinder simulasi dengan camera preview | L | ✅ |
+| S3.4 | Implement multipart upload di service | M | ✅ |
+| S3.5 | Integrasikan `useUploadNutritionPhoto` | M | ✅ |
+| S3.6 | AnalysisScreen pakai data dari query cache | M | ✅ |
+| S3.7 | Load nutrition history real API | M | ✅ |
+| S3.8 | Empty/loading/error state history | S | ✅ |
+| S3.9 | Ekstrak card/tag UI | S | ✅ |
 
 **Dependensi:** S0.4, S0.5
 

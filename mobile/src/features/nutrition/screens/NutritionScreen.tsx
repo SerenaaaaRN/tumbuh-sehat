@@ -1,12 +1,14 @@
 import React from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View, ActivityIndicator, RefreshControl } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { Card, CardContent } from "@/components/ui/Card";
 import { IconSymbol } from "@/components/ui/icon-symbol";
-import { useNutritionStore, NutritionLog } from "@/stores/nutritionStore";
 import { formatTime } from "@/utils/format";
+import { useChildrenList } from "@/features/children/hooks/useChildren";
+import { useNutritionLogs, useDeleteNutritionLog } from "@/features/nutrition/hooks/useNutrition";
+import type { NutritionLog } from "@/features/nutrition/types/nutrition.types";
 
 type SuggestionItem = {
   id: string;
@@ -43,8 +45,13 @@ const SUGGESTIONS: SuggestionItem[] = [
 ];
 
 export const NutritionScreen = () => {
-  const logs = useNutritionStore((s) => s.logs);
-  const removeLog = useNutritionStore((s) => s.removeLog);
+  const { data: childrenData } = useChildrenList();
+  const childId = childrenData?.data?.[0]?.id ?? "";
+
+  const { data: logsData, isLoading, isError, refetch, isRefetching } = useNutritionLogs(childId);
+  const deleteLog = useDeleteNutritionLog(childId);
+
+  const logs = logsData?.data ?? [];
 
   const totalCalories = logs.reduce((acc, curr) => acc + curr.calories, 0);
   const totalProtein = Math.round(logs.reduce((acc, curr) => acc + curr.protein, 0) * 10) / 10;
@@ -85,7 +92,11 @@ export const NutritionScreen = () => {
           {item.calories} kkal • P: {item.protein}g • L: {item.fat}g • K: {item.carbs}g • S: {item.fiber || 0}g
         </Text>
       </View>
-      <Pressable onPress={() => removeLog(item.id)} className="p-1.5 rounded-full hover:bg-danger-light active:scale-95">
+      <Pressable
+        onPress={() => deleteLog.mutate(item.id)}
+        disabled={deleteLog.isPending}
+        className={`p-1.5 rounded-full hover:bg-danger-light active:scale-95 ${deleteLog.isPending ? 'opacity-50' : ''}`}
+      >
         <IconSymbol name="plus" size={18} color="#ba1a1a" style={deleteIconStyle} />
       </Pressable>
     </View>
@@ -111,7 +122,13 @@ export const NutritionScreen = () => {
         </View>
       </View>
 
-      <ScrollView contentContainerStyle={{ paddingBottom: 110 }} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={{ paddingBottom: 110 }}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={isRefetching} onRefresh={refetch} colors={["#3e646a"]} />
+        }
+      >
         {/* Daily Summary Card */}
         <View className="px-container-padding pt-6 pb-2">
           <Card className="bg-primary/5 border border-primary/10">
@@ -211,7 +228,26 @@ export const NutritionScreen = () => {
         {/* Riwayat Hari Ini */}
         <View className="px-container-padding py-4">
           <Text className="font-bold text-base text-on-surface mb-3">Riwayat Hari Ini</Text>
-          {logs.length === 0 ? (
+
+          {!childId ? (
+            <View className="bg-surface-low border border-outline-variant/10 rounded-[24px] p-8 items-center justify-center">
+              <Text className="text-2xl mb-2">👶</Text>
+              <Text className="text-xs text-outline font-medium text-center">Silakan tambahkan profil anak terlebih dahulu</Text>
+            </View>
+          ) : isLoading ? (
+            <View className="py-8 items-center justify-center">
+              <ActivityIndicator size="small" color="#3e646a" />
+              <Text className="text-xs text-outline mt-2">Memuat riwayat...</Text>
+            </View>
+          ) : isError ? (
+            <View className="bg-danger/10 border border-danger/20 rounded-[24px] p-6 items-center justify-center">
+              <IconSymbol name="exclamationmark.triangle.fill" size={24} color="#ba1a1a" />
+              <Text className="text-xs text-danger font-medium mt-2 text-center">Gagal memuat riwayat</Text>
+              <Pressable onPress={() => refetch()} className="mt-3 bg-danger px-4 py-2 rounded-full">
+                <Text className="text-[10px] font-bold text-white">Coba Lagi</Text>
+              </Pressable>
+            </View>
+          ) : logs.length === 0 ? (
             <View className="bg-surface-low border border-outline-variant/10 rounded-[24px] p-8 items-center justify-center">
               <Text className="text-2xl mb-1">🍽️</Text>
               <Text className="text-xs text-outline font-medium">Belum ada makanan yang dicatat hari ini</Text>
