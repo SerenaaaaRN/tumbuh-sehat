@@ -45,7 +45,7 @@ const SUGGESTIONS: SuggestionItem[] = [
 ];
 
 export const NutritionScreen = () => {
-  const { data: childrenData } = useChildrenList();
+  const { data: childrenData, isLoading: isLoadingChildren } = useChildrenList();
   const childId = childrenData?.data?.[0]?.id ?? "";
 
   const { data: logsData, isLoading, isError, refetch, isRefetching } = useNutritionLogs(childId);
@@ -229,7 +229,12 @@ export const NutritionScreen = () => {
         <View className="px-container-padding py-4">
           <Text className="font-bold text-base text-on-surface mb-3">Riwayat Hari Ini</Text>
 
-          {!childId ? (
+          {isLoadingChildren ? (
+            <View className="py-8 items-center justify-center">
+              <ActivityIndicator size="small" color="#3e646a" />
+              <Text className="text-xs text-outline mt-2">Memuat data anak...</Text>
+            </View>
+          ) : !childId ? (
             <View className="bg-surface-low border border-outline-variant/10 rounded-[24px] p-8 items-center justify-center">
               <Text className="text-2xl mb-2">👶</Text>
               <Text className="text-xs text-outline font-medium text-center">Silakan tambahkan profil anak terlebih dahulu</Text>

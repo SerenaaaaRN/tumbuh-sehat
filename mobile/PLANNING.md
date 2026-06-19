@@ -103,13 +103,13 @@ Ganti chat mock lokal dengan chat dari API, simpan & load history berdasarkan `p
 ### Tasks
 | ID | Task | Complexity |
 |----|------|------------|
-| S4.1 | Tambah tipe chat | S |
-| S4.2 | Implement chat.service.ts dual-mode | M |
-| S4.3 | Implement useChat (query + mutation) | M |
-| S4.4 | Refactor ConsultScreen pakai hook/service | L |
-| S4.5 | Ekstrak ChatBubble, ChatInput, SuggestedChips | M |
-| S4.6 | Prediction selector/child context untuk chat | M |
-| S4.7 | Guard jika belum ada prediction completed | S |
+| ✅ S4.1 | Tambah tipe chat | S |
+| ✅ S4.2 | Implement chat.service.ts dual-mode | M |
+| ✅ S4.3 | Implement useChat (query + mutation) | M |
+| ✅ S4.4 | Refactor ConsultScreen pakai hook/service | L |
+| ✅ S4.5 | Ekstrak ChatBubble, ChatInput, SuggestedChips | M |
+| ✅ S4.6 | Prediction selector/child context untuk chat | M |
+| ✅ S4.7 | Guard jika belum ada prediction completed | S |
 
 **Dependensi:** S0.6, S0.7, S1.x
 

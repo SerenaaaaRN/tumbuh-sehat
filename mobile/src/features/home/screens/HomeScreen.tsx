@@ -3,12 +3,12 @@ import { router } from "expo-router";
 import { ScrollView, Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Image } from "expo-image";
-
 import { Card } from "@/components/ui/Card";
 import { Empty, EmptyHeader, EmptyTitle, EmptyDescription, EmptyContent, EmptyMedia } from "@/components/ui/Empty";
 import { Button } from "@/components/ui/Button";
 import { LoadingOverlay } from "@/components/ui/LoadingOverlay";
 import { useChildrenList } from "@/features/children/hooks/useChildren";
+import { useChildStore } from "@/features/children/stores/childStore";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 
 const MiniBarChart = React.memo(({ color }: { color: string }) => (
@@ -68,12 +68,19 @@ NutritionColumn.displayName = 'NutritionColumn';
 export const HomeScreen = () => {
   const { data, isLoading } = useChildrenList();
   const children = data?.data ?? [];
-  const [activeChildId, setActiveChildId] = useState<string | null>(null);
+  const { activeChildId, setActiveChildId } = useChildStore();
 
   if (isLoading) return <LoadingOverlay />;
 
   // Default active child to the first child if not selected
   const activeChild = children.find((c) => c.id === activeChildId) ?? children[0];
+
+  // Set active child automatically if not set
+  React.useEffect(() => {
+    if (!activeChildId && activeChild) {
+      setActiveChildId(activeChild.id);
+    }
+  }, [activeChild, activeChildId, setActiveChildId]);
 
   if (!activeChild) {
     return (

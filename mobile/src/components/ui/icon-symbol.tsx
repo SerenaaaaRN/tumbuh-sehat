@@ -39,7 +39,10 @@ const MAPPING = {
   'fork.knife': 'restaurant',
   'magnifyingglass': 'search',
   'bell': 'notifications',
-  'checkmark': 'check'
+  'checkmark': 'check',
+  'photo.fill': 'photo-library',
+  'bolt.fill': 'flash-on',
+  'bolt.slash.fill': 'flash-off'
 } as IconMapping;
 
 /**
