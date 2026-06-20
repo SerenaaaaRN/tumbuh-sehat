@@ -3,8 +3,12 @@ import { Tabs } from "expo-router";
 import { HapticTab } from "@/components/haptic-tab";
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { Colors } from "@/constants/theme";
+import { useAuthStore } from "@/stores/authStore";
 
 export const TabsLayout = () => {
+  const role = useAuthStore((s) => s.user?.role);
+  const isMedic = role === "MEDIC";
+
   return (
     <Tabs
       screenOptions={{
@@ -33,7 +37,7 @@ export const TabsLayout = () => {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Beranda",
+          title: isMedic ? "Dashboard" : "Beranda",
           tabBarIcon: ({ color }) => <IconSymbol name="house.fill" size={24} color={color} />,
         }}
       />
@@ -42,6 +46,7 @@ export const TabsLayout = () => {
         options={{
           title: "Log Gizi",
           tabBarIcon: ({ color }) => <IconSymbol name="doc.text.fill" size={24} color={color} />,
+          href: isMedic ? null : "/(app)/(tabs)/scanner",
         }}
       />
       <Tabs.Screen
@@ -49,6 +54,7 @@ export const TabsLayout = () => {
         options={{
           title: "Tanya AI",
           tabBarIcon: ({ color }) => <IconSymbol name="bubble.left.fill" size={24} color={color} />,
+          href: isMedic ? null : "/(app)/(tabs)/consult",
         }}
       />
       <Tabs.Screen

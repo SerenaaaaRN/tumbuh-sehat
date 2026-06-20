@@ -3,6 +3,7 @@ import type { AuthResponse, User } from '@/features/auth/types/auth.types';
 import type { Child } from '@/features/children/types/child.types';
 import type { AssessmentResponseDTO, AssessmentRequestDTO } from '@/features/assessment/types/assessment.types';
 import type { NutritionLog, NutritionUploadRequest } from '@/features/nutrition/types/nutrition.types';
+import type { VcRecord, VcIssueRequest } from '@/features/vc/types/vc.types';
 
 export const USE_MOCK = true;
 
@@ -24,6 +25,14 @@ let mockUsers: MockUser[] = [
     name: 'Budi Santoso',
     role: 'PARENT',
     walletAddress: null,
+  },
+  {
+    id: 'user_medic_001',
+    email: 'medic@example.com',
+    password: 'password123',
+    name: 'Dr. Siti Nurhaliza',
+    role: 'MEDIC',
+    walletAddress: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb',
   },
 ];
 
@@ -244,6 +253,61 @@ export const addMockNutritionLog = (req: NutritionUploadRequest): NutritionLog =
 
 export const removeMockNutritionLog = (id: string) => {
   mockNutritionLogs = mockNutritionLogs.filter((log) => log.id !== id);
+};
+
+// ---------------------------------------------------------------------------
+// Reports helpers
+// ---------------------------------------------------------------------------
+
+export const getMockReportUrl = (childId: string, from?: string, to?: string): string => {
+  const params = new URLSearchParams();
+  if (from) params.set('from', from);
+  if (to) params.set('to', to);
+  const qs = params.toString();
+  return `https://storage.tumbuhsehat.example/reports/${childId}_report.pdf${qs ? `?${qs}` : ''}`;
+};
+
+// ---------------------------------------------------------------------------
+// Blockchain verification helpers
+// ---------------------------------------------------------------------------
+
+export type BlockchainVerificationResult = {
+  assessmentId: string;
+  isValid: boolean;
+  recordHash: string;
+  txHash: string;
+  blockNumber: number;
+  anchorStatus: 'CONFIRMED' | 'PENDING' | 'NOT_FOUND';
+  explorerUrl: string;
+  verifiedAt: string;
+};
+
+export const getMockBlockchainVerification = (
+  assessmentId: string,
+): BlockchainVerificationResult => {
+  const assessment = mockAssessments.find((a) => a.id === assessmentId);
+  if (!assessment || !assessment.blockchain.anchored) {
+    return {
+      assessmentId,
+      isValid: false,
+      recordHash: '',
+      txHash: '',
+      blockNumber: 0,
+      anchorStatus: 'NOT_FOUND',
+      explorerUrl: '',
+      verifiedAt: new Date().toISOString(),
+    };
+  }
+  return {
+    assessmentId,
+    isValid: true,
+    recordHash: assessment.blockchain.recordHash,
+    txHash: assessment.blockchain.txHash,
+    blockNumber: assessment.blockchain.blockNumber,
+    anchorStatus: assessment.blockchain.anchorStatus,
+    explorerUrl: assessment.blockchain.explorerUrl,
+    verifiedAt: new Date().toISOString(),
+  };
 };
 
 export const addMockAssessment = (req: AssessmentRequestDTO): AssessmentResponseDTO => {

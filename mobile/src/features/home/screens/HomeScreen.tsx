@@ -70,8 +70,6 @@ export const HomeScreen = () => {
   const children = data?.data ?? [];
   const { activeChildId, setActiveChildId } = useChildStore();
 
-  if (isLoading) return <LoadingOverlay />;
-
   // Default active child to the first child if not selected
   const activeChild = children.find((c) => c.id === activeChildId) ?? children[0];
 
@@ -81,6 +79,8 @@ export const HomeScreen = () => {
       setActiveChildId(activeChild.id);
     }
   }, [activeChild, activeChildId, setActiveChildId]);
+
+  if (isLoading) return <LoadingOverlay />;
 
   if (!activeChild) {
     return (

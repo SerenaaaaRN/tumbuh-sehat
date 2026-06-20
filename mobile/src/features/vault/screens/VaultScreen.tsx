@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { router } from "expo-router";
 import { FlashList } from "@shopify/flash-list";
 import { Card, CardContent } from "@/components/ui/Card";
 import { IconSymbol } from "@/components/ui/icon-symbol";
@@ -100,16 +101,24 @@ export const VaultScreen = () => {
     <SafeAreaView className="flex-1 bg-background" edges={['top']}>
       {/* Header */}
       <View className="px-container-padding py-6 border-b border-surface-container bg-surface-lowest">
-        <View className="flex-row items-center gap-3">
-          <View className="w-12 h-12 rounded-full bg-primary-light items-center justify-center">
-            <IconSymbol name="wallet.pass.fill" size={24} color="#3e646a" />
+        <View className="flex-row items-center justify-between">
+          <View className="flex-row items-center gap-3 flex-1">
+            <View className="w-12 h-12 rounded-full bg-primary-light items-center justify-center">
+              <IconSymbol name="wallet.pass.fill" size={24} color="#3e646a" />
+            </View>
+            <View className="flex-1">
+              <Text className="text-xl font-bold text-on-surface">GiziChain Health Vault</Text>
+              <Text className="text-[10px] text-outline font-medium">
+                Data rekam medis anti-stunting
+              </Text>
+            </View>
           </View>
-          <View>
-            <Text className="text-xl font-bold text-on-surface">GiziChain Health Vault</Text>
-            <Text className="text-xs text-outline font-medium">
-              Data rekam medis terdesentralisasi anti-stunting
-            </Text>
-          </View>
+          <Pressable
+            onPress={() => router.push("/(app)/vc/scan")}
+            className="w-10 h-10 bg-secondary/10 rounded-full items-center justify-center border border-secondary/20"
+          >
+            <IconSymbol name="qrcode.viewfinder" size={20} color="#506444" />
+          </Pressable>
         </View>
       </View>
 

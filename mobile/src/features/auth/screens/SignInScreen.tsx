@@ -1,10 +1,11 @@
-import { router } from "expo-router";
-import { useRef, useState } from "react";
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Button } from "@/components/ui/Button";
 import { InputField } from "@/components/common/InputField";
+import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/features/auth/hooks/useAuth";
+import { cn } from "@/utils/cn";
+import { router } from "expo-router";
+import { useEffect, useRef, useState } from "react";
+import { Keyboard, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 type FormErrors = { email?: string; password?: string };
 
@@ -22,6 +23,21 @@ export const SignInScreen = () => {
   const emailRef = useRef("");
   const passwordRef = useRef("");
   const [formErrors, setFormErrors] = useState<FormErrors>({});
+  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
+      setKeyboardVisible(true);
+    });
+    const hideSubscription = Keyboard.addListener("keyboardDidHide", () => {
+      setKeyboardVisible(false);
+    });
+
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, []);
 
   const handleLogin = async () => {
     const errs = validate(emailRef.current, passwordRef.current);
@@ -37,12 +53,17 @@ export const SignInScreen = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-background">
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} className="flex-1">
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        className="flex-1"
+        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+      >
         <ScrollView
-          contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}
-          className="px-6 py-8"
+          className="flex-1"
+          contentContainerClassName={cn("flex-grow px-6 py-8", !isKeyboardVisible ? "justify-center" : null)}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
+          keyboardDismissMode="interactive"
         >
           {/* Brand Header */}
           <View className="items-center gap-3 mb-10">

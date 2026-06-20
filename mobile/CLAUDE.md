@@ -49,6 +49,7 @@ _layout.tsx                           # Root: QueryClientProvider + Auth Gate
 └── (app)/                            # Protected by auth guard
     ├── _layout.tsx                   # Stack navigator
     │   ├── (tabs)/                   # Bottom tabs
+    │   │   ├── _layout.tsx           # Custom floating tab bar
     │   │   ├── index.tsx             # Beranda → HomeScreen
     │   │   ├── scanner.tsx           # Log Gizi → NutritionScreen
     │   │   ├── consult.tsx           # Tanya AI → ConsultScreen
@@ -57,6 +58,7 @@ _layout.tsx                           # Root: QueryClientProvider + Auth Gate
     │   │
     │   ├── children/new.tsx          # → AddChildScreen
     │   ├── children/[childId].tsx    # → ChildDetailScreen
+    │   ├── children/[childId]/edit.tsx      # → EditChildScreen
     │   ├── children/[childId]/assessment/
     │   │   ├── body-size.tsx         # → BodySizeScreen (Step 2)
     │   │   ├── feeding-history.tsx   # → FeedingHistoryScreen (Step 3)
@@ -66,7 +68,13 @@ _layout.tsx                           # Root: QueryClientProvider + Auth Gate
     │   │
     │   ├── scanner/scan.tsx          # → ScannerScreen (camera simulasi)
     │   ├── scanner/manual.tsx        # → ManualEntryScreen
-    │   └── scanner/analysis.tsx      # → AnalysisScreen
+    │   ├── scanner/analysis.tsx      # → AnalysisScreen
+    │   ├── report.tsx                # → ReportScreen (PDF)
+    │   ├── medic/dashboard.tsx       # → MedicDashboardScreen
+    │   ├── blockchain/verify/[assessmentId].tsx  # → BlockchainVerifyScreen
+    │   ├── vc/[vcId].tsx             # → VcDetailScreen
+    │   ├── vc/scan.tsx               # → VcScannerScreen
+    │   └── vc/verify-result.tsx      # → VcVerifyResultScreen
 ```
 
 **Auth Gate**: `app/_layout.tsx` — `Stack.Protected` berdasarkan `isAuthenticated` dari authStore. SplashScreen ditahan sampai `isHydrated = true`.
@@ -78,33 +86,23 @@ _layout.tsx                           # Root: QueryClientProvider + Auth Gate
 ```
 src/
 ├── app/                          # Expo Router entry points (thin wrappers)
-├── features/                     # Domain modules per fitur
-│   ├── auth/                     # Auth module
-│   │   ├── screens/              # SignInScreen, RegisterScreen
-│   │   ├── hooks/                # useAuth.ts
-│   │   ├── services/             # auth.service.ts
-│   │   └── types/                # auth.types.ts
-│   ├── children/                 # Manajemen anak
-│   │   ├── screens/              # AddChildScreen, ChildDetailScreen
-│   │   ├── hooks/                # useChildren, useChildGrowthTracker
-│   │   ├── services/             # children.service.ts
-│   │   └── types/                # child.types.ts
-│   ├── home/                     # Dashboard
-│   │   └── screens/              # HomeScreen
+├── features/                     # Domain modules per fitur (semua punya barrel index.ts)
+│   ├── auth/                     # Sign in, register, refresh
+│   ├── children/                 # CRUD anak + growth tracker
+│   ├── home/                     # Dashboard beranda
 │   ├── profile/                  # Profil user
-│   │   └── screens/              # ProfileScreen
-│   ├── assessment/               # Assessment stunting
-│   │   ├── screens/              # BodySize, FeedingHistory, IllnessHistory, Review, Results
-│   │   ├── components/           # DisclaimerText
-│   │   └── types/                # assessment.types.ts
-│   ├── nutrition/                # Log gizi & foto makanan
-│   │   └── screens/              # NutritionScreen, ScannerScreen, ManualEntryScreen, AnalysisScreen
-│   ├── consult/                  # Chatbot AI
-│   │   └── screens/              # ConsultScreen
-│   └── vault/                    # Blockchain ledger
-│       └── screens/              # VaultScreen
+│   ├── assessment/               # Assessment 5-langkah + prediksi
+│   ├── nutrition/                # Log gizi, scanner, analisis
+│   ├── chat/                     # Chatbot AI (lebih baru dari consult/)
+│   ├── vault/                    # Blockchain ledger (Zustand store)
+│   ├── consult/                  # (legacy — masih ada screens/, prefer chat/)
+│   ├── blockchain/               # Verifikasi on-chain
+│   ├── vc/                       # Verifiable Credential W3C
+│   ├── medic/                    # Dashboard tenaga medis
+│   ├── posyandu/                 # Modul kader posyandu
+│   └── report/                   # Unduh laporan PDF
 │
-├── components/                   # Shared UI (global atomik)
+├── components/                   # Shared UI (global atomik, stateless)
 │   └── ui/                       # Button, Input, Card, StatusBadge, EmptyState, dll
 ├── services/                     # Shared networking
 │   ├── api.ts                    # Axios instance + interceptor
@@ -390,6 +388,7 @@ SEVERELY_STUNTED: dark red (#93000a)
 - Atoms in `components/ui/` — Button, Input (basic), Card, Badge, Field, Empty, LoadingOverlay, Label
 - Molecules in `components/common/` — InputField (composes Input + Field), StatusBadge (composes Badge)
 - Always register new top-level folders in `tailwind.config.js` `content[]`
+- **Aturan `components/ui/`**: WAJIB stateless & tanpa logika bisnis. Komponen dengan logika spesifik fitur (ZScoreBadge, ChatBubble, dll) taruh di `features/xxx/components/`.
 
 ### Icon System
 - `components/ui/icon-symbol.tsx` — maps SF Symbol names → Material Icons
@@ -451,25 +450,24 @@ Di `ConsultScreen.tsx` ada banner warning sticky di bawah header:
 | Fitur | Status | Mock? | Prioritas |
 |-------|--------|-------|-----------|
 | Auth (Login/Register/Refresh/Logout) | ✅ Complete | ✅ Mock | Critical |
-| Children (List/Create/Detail) | ✅ Complete | ✅ Mock | Critical |
-| Edit Child | ✅ Complete | ✅ Mock | Medium |
+| Children (List/Create/Detail/Edit) | ✅ Complete | ✅ Mock | Critical |
 | Assessment 5-Step (Body → Feeding → Illness → Review → Results) | ✅ Complete | ✅ Mock | Critical |
 | Loading PENDING + polling prediction | ✅ Complete | ✅ Mock | High |
 | WHO Growth Chart proper | ✅ Complete | ✅ Mock | High |
 | Nutrition Scanner/Camera | ⚠️ Simulated UI | ✅ Mock | High |
-| Nutrition History List | ⚠️ Partial | ✅ Mock | Medium |
+| Nutrition History List | ✅ Complete | ✅ Mock | Medium |
 | Chatbot AI | ✅ Complete | ✅ Mock | High |
 | Chat History Persistent | ❌ Missing | — | Medium |
-| PDF Reports | ❌ Missing | — | Medium |
+| PDF Reports | ✅ Complete | ✅ Mock | Medium |
+| MEDIC Dashboard | ✅ Complete | ✅ Mock | High |
+| POSYANDU Screens | ⚠️ Partial | ✅ Mock | Medium |
+| ADMIN Screens | ❌ Missing | — | Low |
+| QR Scanner (VC) | ✅ Complete | ✅ Mock | High |
+| VC Status on Child Detail | ❌ Missing | — | High |
+| Blockchain Verification | ✅ Complete | ✅ Mock | Medium |
 | Push Notifications | ❌ Missing | — | Low |
 | Maps / Faskes Terdekat | ❌ Missing | — | Low |
 | Offline Mode | ❌ Missing | — | Low |
-| MEDIC Dashboard | ❌ Missing | — | High |
-| POSYANDU Screens | ❌ Missing | — | Medium |
-| ADMIN Screens | ❌ Missing | — | Low |
-| QR Scanner (VC) | ❌ Missing | — | High |
-| VC Status on Child Detail | ❌ Missing | — | High |
-| Blockchain Verification | ❌ Missing | — | Medium |
 
 ---
 
@@ -537,36 +535,42 @@ Gunakan `delay(ms)` dari `mock.ts` untuk simulasi network latency (default 600ms
 
 ---
 
-## 19. MISSING SERVICES (Perlu Dibuat)
+## 19. SERVICE & HOOK STATUS
 
-Service files yang belum ada tapi dibutuhkan untuk real API integration:
+✅ **Semua service/hook utama sudah dibuat dengan pola dual-mode (mock/real):**
 
-| Service Path | Fungsi |
-|-------------|--------|
-| `features/assessment/services/assessment.service.ts` | POST/GET assessment |
-| `features/assessment/services/prediction.service.ts` | Polling prediksi |
-| `features/assessment/hooks/usePrediction.ts` | Hook polling + state |
-| `features/nutrition/services/nutrition.service.ts` | Upload foto + riwayat |
-| `features/nutrition/hooks/useNutrition.ts` | Hook log gizi |
-| `features/chat/services/chat.service.ts` | Send message + riwayat |
-| `features/chat/hooks/useChat.ts` | Hook chat |
+| Fitur | Service | Hook |
+|-------|---------|------|
+| Auth | `auth/services/auth.service.ts` ✅ | `auth/hooks/useAuth.ts` ✅ |
+| Children | `children/services/children.service.ts` ✅ | `children/hooks/useChildren.ts` ✅ |
+| Assessment | `assessment/services/assessment.service.ts` ✅ | `assessment/hooks/useAssessment.ts` ✅ |
+| Nutrition | `nutrition/services/nutrition.service.ts` ✅ | `nutrition/hooks/useNutrition.ts` ✅ |
+| Chat | `chat/services/chat.service.ts` ✅ | `chat/hooks/useChat.ts` ✅ |
+| Blockchain | `blockchain/services/blockchain.service.ts` ✅ | `blockchain/hooks/useBlockchain.ts` ✅ |
+| Medic | `medic/services/medic.service.ts` ✅ | `medic/hooks/useMedic.ts` ✅ |
+| Vc | `vc/services/vc.service.ts` ✅ | `vc/hooks/useVc.ts` ✅ |
+| Posyandu | `posyandu/services/posyandu.service.ts` ✅ | `posyandu/hooks/usePosyandu.ts` ✅ |
+| Report | `report/services/report.service.ts` ✅ | `report/hooks/useReport.ts` ✅ |
 
-Ikuti pola dual-mode (mock/real) seperti `auth.service.ts` dan `children.service.ts`.
+**Masih perlu dibuat:** Prediction service/hook (polling prediksi PENDING → COMPLETED).
 
 ---
 
-## 20. MISSING COMPONENTS (Perlu Diekstrak)
+## 20. COMPONENT STATUS
 
-Components yang masih inline di screen dan perlu diekstrak ke folder masing-masing:
+✅ **Semua komponen yang sebelumnya inline sudah diekstrak:**
 
-- `features/assessment/components/AssessmentCard.tsx`
-- `features/assessment/components/PredictionCard.tsx`
-- `features/assessment/components/ZScoreBadge.tsx`
-- `features/nutrition/components/NutritionCard.tsx`
-- `features/nutrition/components/FoodTagList.tsx`
-- `features/chat/components/ChatBubble.tsx`
-- `features/chat/components/ChatInput.tsx`
-- `features/chat/components/SuggestedChips.tsx`
+| Komponen | Lokasi | Status |
+|----------|--------|--------|
+| `DisclaimerText` | `assessment/components/` | ✅ |
+| `AssessmentCard` | `assessment/components/` | ✅ |
+| `PredictionCard` | `assessment/components/` | ✅ |
+| `ZScoreBadge` | `assessment/components/` | ✅ |
+| `NutritionCard` | `nutrition/components/` | ✅ |
+| `FoodTagList` | `nutrition/components/` | ✅ |
+| `ChatBubble` | `chat/components/` | ✅ |
+| `ChatInput` | `chat/components/` | ✅ |
+| `SuggestedChips` | `chat/components/` | ✅ |
 
 ---
 

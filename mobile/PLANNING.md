@@ -73,7 +73,7 @@ Ganti hardcoded chart data dengan visualisasi berbasis data assessment nyata & z
 
 ---
 
-## Sprint 3 — Nutrition Scanner/Camera Real
+## Sprint 3 — Nutrition Scanner/Camera Real (SELESAI)
 
 ### Tujuan
 Ganti scanner simulasi dengan kamera nyata + upload multipart, sambungkan history ke API.
@@ -95,7 +95,7 @@ Ganti scanner simulasi dengan kamera nyata + upload multipart, sambungkan histor
 
 ---
 
-## Sprint 4 — Chat History Persistent
+## Sprint 4 — Chat History Persistent (SELESAI)
 
 ### Tujuan
 Ganti chat mock lokal dengan chat dari API, simpan & load history berdasarkan `predictionId`.
@@ -115,46 +115,46 @@ Ganti chat mock lokal dengan chat dari API, simpan & load history berdasarkan `p
 
 ---
 
-## Sprint 5 — VC Status & QR Scanner
+## Sprint 5 — VC Status & QR Scanner (SELESAI)
 
 ### Tujuan
 Status VC di detail anak + QR scanner verifikasi VC.
 
 ### Tasks
-| ID | Task | Complexity |
-|----|------|------------|
-| S5.1 | Tambah tipe VC | S |
-| S5.2 | Buat VC service dual-mode | M |
-| S5.3 | Buat hook `useVcStatus` & `useVerifyVc` | M |
-| S5.4 | Buat komponen VcStatusCard | S |
-| S5.5 | Tampilkan VC status di child detail | M |
-| S5.6 | Route QR scanner VC | S |
-| S5.7 | Screen QR scanner | L |
-| S5.8 | Screen hasil verifikasi VC | M |
-| S5.9 | Register stack routes | S |
-| S5.10 | Perluas mock VC & verify QR | M |
+| ID | Task | Complexity | Status |
+|----|------|------------|--------|
+| S5.1 | Tambah tipe VC | S | ✅ | ✅ |
+| S5.2 | Buat VC service dual-mode | M | ✅ |
+| S5.3 | Buat hook `useVcStatus` & `useVerifyVc` | M | ✅ |
+| S5.4 | Buat komponen VcStatusCard | S | ✅ |
+| S5.5 | Tampilkan VC status di child detail | M | ✅ |
+| S5.6 | Route QR scanner VC | S | ✅ |
+| S5.7 | Screen QR scanner | L | ✅ |
+| S5.8 | Screen hasil verifikasi VC | M | ✅ |
+| S5.9 | Register stack routes | S | ✅ |
+| S5.10 | Perluas mock VC & verify QR | M | ✅ |
 
 **Dependensi:** S0.12, S3.1 (reuse kamera dep)
 
 ---
 
-## Sprint 6 — MEDIC Dashboard
+## Sprint 6 — MEDIC Dashboard (SELESAI)
 
 ### Tujuan
 Screen untuk tenaga medis: lihat semua pasien, filter/search, akses detail & VC.
 
 ### Tasks
-| ID | Task | Complexity |
-|----|------|------------|
-| S6.1 | Mock user role MEDIC | S |
-| S6.2 | Types medic dashboard | S |
-| S6.3 | Medic service dual-mode | M |
-| S6.4 | Hook medic dashboard | M |
-| S6.5 | MedicDashboardScreen | L |
-| S6.6 | Route medic dashboard | S |
-| S6.7 | Role-aware tab/redirect | M |
-| S6.8 | PatientCard component | M |
-| S6.9 | Integrasi aksi issue/revoke VC placeholder | M |
+| ID | Task | Complexity | Status |
+|----|------|------------|--------|
+| S6.1 | Mock user role MEDIC | S | ✅ |
+| S6.2 | Types medic dashboard | S | ✅ |
+| S6.3 | Medic service dual-mode | M | ✅ |
+| S6.4 | Hook medic dashboard | M | ✅ |
+| S6.5 | MedicDashboardScreen | L | ✅ |
+| S6.6 | Route medic dashboard | S | ✅ |
+| S6.7 | Role-aware tab/redirect | M | ✅ |
+| S6.8 | PatientCard component | M | ✅ |
+| S6.9 | Integrasi aksi issue/revoke VC placeholder | M | ✅ |
 
 **Dependensi:** AuthStore role, S5.x, Role-aware routing
 

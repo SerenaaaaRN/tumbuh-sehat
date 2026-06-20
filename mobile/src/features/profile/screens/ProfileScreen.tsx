@@ -1,7 +1,9 @@
-import { Alert, ScrollView, Text, View } from 'react-native';
+import { Alert, ScrollView, Text, View, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { router } from 'expo-router';
 
 import { Button } from '@/components/ui/Button';
+import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { useAuthStore } from '@/stores/authStore';
 
@@ -70,6 +72,20 @@ export const ProfileScreen = () => {
           <View className="h-[1px] bg-gray-100 my-1" />
           <InfoRow label="Email" value={user?.email ?? '-'} />
           <InfoRow label="Role" value={ROLE_LABELS[user?.role ?? ''] ?? '-'} />
+        </View>
+
+        {/* Action Menu */}
+        <View className="py-2 px-5 bg-white rounded-2xl gap-1 mb-2">
+          <Pressable
+            onPress={() => router.push('/(app)/report')}
+            className="flex-row items-center py-3 border-b border-gray-100"
+          >
+            <View className="w-8 h-8 rounded-full bg-primary/10 items-center justify-center mr-3">
+              <IconSymbol name="doc.text.fill" size={16} color="#3e646a" />
+            </View>
+            <Text className="flex-1 text-sm font-semibold text-gray-900">Unduh Laporan PDF</Text>
+            <IconSymbol name="chevron.right" size={16} color="#9ca3af" />
+          </Pressable>
         </View>
 
         {/* Logout */}

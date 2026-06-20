@@ -3,8 +3,8 @@ import { useRef, useState } from "react";
 import { Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { Button } from "@/components/ui/Button";
 import { InputField } from "@/components/common/InputField";
+import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 
 type FormErrors = { name?: string; email?: string; password?: string };
@@ -50,8 +50,8 @@ export const RegisterScreen = () => {
     <SafeAreaView className="flex-1 bg-background">
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} className="flex-1">
         <ScrollView
-          contentContainerStyle={{ flexGrow: 1 }}
           className="px-6 py-8"
+          contentContainerClassName="flex-grow"
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
@@ -61,9 +61,7 @@ export const RegisterScreen = () => {
               <Text className="text-base font-semibold text-primary">← Kembali</Text>
             </Pressable>
             <Text className="text-3xl font-extrabold tracking-tight text-on-surface">Buat Akun</Text>
-            <Text className="text-sm text-outline">
-              Daftar untuk mulai memantau tumbuh kembang anak
-            </Text>
+            <Text className="text-sm text-outline">Daftar untuk mulai memantau tumbuh kembang anak</Text>
           </View>
 
           {/* Form */}

@@ -29,11 +29,47 @@ export default function AppLayout() {
         options={{ headerShown: false }}
       />
       <Stack.Screen
+        name="children/[childId]/edit"
+        options={{ title: 'Edit Anak', headerBackTitle: 'Kembali' }}
+      />
+      <Stack.Screen
         name="children/[childId]/assessment/review"
         options={{ headerShown: false }}
       />
       <Stack.Screen
+        name="children/[childId]/assessment/feeding-history"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="children/[childId]/assessment/illness-history"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
         name="children/[childId]/assessment/results"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="report"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="blockchain/verify/[assessmentId]"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="medic/dashboard"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="vc/scan"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="vc/verify-result"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="vc/[vcId]"
         options={{ headerShown: false }}
       />
     </Stack>
