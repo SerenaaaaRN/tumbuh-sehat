@@ -10,6 +10,7 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import { useChild } from '@/features/children/hooks/useChildren';
 import { useChildAssessments } from '@/features/assessment/hooks/useAssessment';
 import { GrowthChart, type GrowthDataPoint } from '@/features/children/components/GrowthChart';
+import { useVcStatus, VcStatusCard } from '@/features/vc';
 
 export const ChildDetailScreen = () => {
   const { childId } = useLocalSearchParams<{ childId: string }>();
@@ -17,6 +18,7 @@ export const ChildDetailScreen = () => {
 
   const { data: child, isLoading: isChildLoading } = useChild(childId ?? '');
   const { data: assessmentsData, isLoading: isAssessmentsLoading } = useChildAssessments(childId ?? '', 0, 50);
+  const { vc, hasActiveVc, isLoading: isVcLoading } = useVcStatus(childId ?? '');
 
   const assessments = useMemo(() => {
     return assessmentsData?.data ?? [];
@@ -126,6 +128,22 @@ export const ChildDetailScreen = () => {
             Data didasarkan pada perhitungan z-score WHO standar deviasi -2 hingga +2.
           </Text>
         </View>
+
+        {/* Verifiable Credential Status */}
+        {!isVcLoading && (
+          <View className="gap-2">
+            <Text className="text-xs font-bold text-outline uppercase tracking-wider">Status Credential</Text>
+            <VcStatusCard
+              vc={vc}
+              hasActiveVc={hasActiveVc}
+              onViewDetails={() => {
+                if (vc) {
+                  router.push(`/(app)/vc/${vc.id}` as any);
+                }
+              }}
+            />
+          </View>
+        )}
 
         {/* Action Button */}
         <Button onPress={handleStartAssessment} variant="primary" className="mb-4">
