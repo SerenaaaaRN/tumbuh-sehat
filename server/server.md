@@ -1,6 +1,6 @@
 # server.md — Progress & Roadmap Backend
 
-## Status Keseluruhan: ~80%
+## Status Keseluruhan: ~90%
 
 ---
 
@@ -29,7 +29,8 @@
 | **VcService** | Issue/revoke/verify W3C Verifiable Credential + QR code, simulation flag |
 | **ReportService** | Generate PDF laporan anak dengan iText (data anak + riwayat assessment + prediksi) |
 | **AdminService** | Manajemen user (CRUD untuk MEDIC/ADMIN), statistik distribusi stunting |
-| **Controllers (8/10)** | AuthController, ChildController, AssessmentController, **NutritionController**, **ChatController**, **ReportController**, **MedicController**, **AdminController** |
+| **Controllers (10/10)** | AuthController, ChildController, AssessmentController, **NutritionController**, **ChatController**, **ReportController**, **MedicController**, **AdminController**, **BlockchainController**, **VcController** |
+| **Unit Tests (74 test)** | **13 service test classes + 1 util test — 0 failures** |
 | **DTO Request (13)** | RegisterRequest, LoginRequest, RefreshTokenRequest, ChildRequest, AssessmentRequest, NutritionRequest, ChatRequest, AnchorRequest, IssueVcRequest, RevokeVcRequest, **CreateUserRequest**, **UpdateUserStatusRequest**, **UpdateUserRoleRequest** |
 | **DTO Response (12)** | AuthResponse, ChildResponse, AssessmentResponse, PredictionResponse, NutritionResponse, ChatResponse, AnchorResponse, VerifyResponse, IssueVcResponse, VcDetailResponse, VerifyQrResponse, PageResponse\<T\> |
 | **pom.xml** | Spring Boot 3.2.0, JDK 17, Web3j 4.12.0, iText 8.0.4 |
@@ -39,12 +40,7 @@
 
 ## ❌ Belum Selesai / Missing
 
-### 🔴 Missing Controllers (2 file)
-
-| Controller | Endpoints |
-|------------|-----------|
-| `BlockchainController` | POST /api/blockchain/anchor, GET /api/blockchain/verify/{assessmentId} |
-| `VcController` | POST /api/vc/issue, GET /api/vc/{vcId}, POST /api/vc/revoke, GET /api/verify |
+### 🔴 Missing Controllers ✅ Selesai Sprint 4
 
 ### 🟡 Lainnya
 
@@ -55,7 +51,7 @@
 | `application-prod.yml` | Belum dibuat |
 | `.env` template | Belum dibuat |
 | `db/migration/` | Tidak ada — pakai `ddl-auto=update` |
-| Tests | Hanya 1 file: `NutricareApplicationTests.java` (context load only) |
+| Tests | **74 test service & utility — 0 failures** (Auth, Child, Assessment, Prediction, Chat, Nutrition, Vc, Admin, Report, Gemini, Storage, Ipfs, ZScore) |
 | `PromptBuilder.java` | Tidak ada — prompt dibangun inline di PredictionService |
 | `VcException.java` | Disebut di ARCHITECTURE.md tapi belum dibuat |
 | Web3j real implementation | BlockchainService & VcService masih mode simulasi |
@@ -71,7 +67,7 @@ src/
 │   │   ├── NutricareApplication.java
 │   │   ├── config/                        # 2 file
 │   │   ├── security/                      # 3 file
-│   │   ├── controller/                    # 8 file (baru: Nutrition, Chat, Report, Medic, Admin)
+│   │   ├── controller/                    # 10 file (baru: Nutrition, Chat, Report, Medic, Admin, Blockchain, Vc)
 │   │   ├── domain/
 │   │   │   ├── entity/                    # 9 entities
 │   │   │   └── enums/                     # 6 enums
@@ -86,8 +82,29 @@ src/
 │   └── resources/
 │       └── application.properties         # ✅ DB, JWT, Gemini, Supabase, CORS, multipart, Polygon, Pinata, simulation
 └── test/
-    └── java/com/nutricare/
-        └── NutricareApplicationTests.java
+    ├── java/com/nutricare/
+    │   ├── NutricareApplicationTests.java
+    │   ├── TestDataFactory.java
+    │   ├── config/
+    │   │   └── TestConfig.java
+    │   ├── service/impl/              # 13 test files
+    │   │   ├── AuthServiceTest.java
+    │   │   ├── ChildServiceTest.java
+    │   │   ├── AssessmentServiceTest.java
+    │   │   ├── PredictionServiceTest.java
+    │   │   ├── ChatServiceTest.java
+    │   │   ├── NutritionServiceTest.java
+    │   │   ├── ReportServiceTest.java
+    │   │   ├── BlockchainServiceTest.java
+    │   │   ├── VcServiceTest.java
+    │   │   ├── AdminServiceTest.java
+    │   │   ├── GeminiServiceTest.java
+    │   │   ├── StorageServiceTest.java
+    │   │   └── IpfsServiceTest.java
+    │   └── util/
+    │       └── ZScoreCalculatorTest.java
+    └── resources/
+        └── application-test.properties
 ```
 
 ---
@@ -122,13 +139,31 @@ src/
 ✅ Repository queries — ChildRepository.findBySearchWithParent, UserRepository.findBySearch/findByRole, PredictionRepository.countByStatus
 ```
 
-### Sprint 4 ⬜ — Blockchain & VC (Controllers)
+### Sprint 4 ✅ — Blockchain & VC (Controllers)
 ```
-1. Bikin BlockchainController
-2. Bikin VcController
+✅ BlockchainController — POST /api/blockchain/anchor + GET /api/blockchain/verify/{assessmentId}
+✅ VcController — POST /api/vc/issue, GET /api/vc/{vcId}, POST /api/vc/revoke, GET /api/verify (publik QR)
+✅ SecurityConfig — tambah public GET /api/vc/** dan GET /api/blockchain/verify/**
 ```
 
-### Sprint 5 ⬜ — Implementasi Web3j Real
+### Sprint 5 ✅ — Service & Utility Unit Tests (74 test)
+```
+✅ AuthServiceTest — 9 test (register, login, refresh, logout, getMe)
+✅ ChildServiceTest — 7 test (CRUD + ownership)
+✅ AssessmentServiceTest — 5 test (create, get, pagination + error cases)
+✅ PredictionServiceTest — 4 test (parse success, parse error, gemini error, skip not found)
+✅ ChatServiceTest — 7 test (sendMessage, getHistory + auth guards)
+✅ NutritionServiceTest — 6 test (analyze + file validation + history)
+✅ VcServiceTest — 8 test (issue, get, revoke, verify QR + error cases)
+✅ AdminServiceTest — 7 test (crud user, filter search, stats aggregation)
+✅ ReportServiceTest — 4 test (pdf generation + error cases)
+✅ GeminiServiceTest — 4 test (callText/callVision success + errors)
+✅ StorageServiceTest — 2 test (upload + error handling)
+✅ IpfsServiceTest — 2 test (upload + error handling)
+✅ ZScoreCalculatorTest — 9 test (all indicators + status determination)
+```
+
+### Sprint 6 ⬜ — Implementasi Web3j Real
 ```
 3. Deploy smart contracts ke testnet (GiziChainRegistry + VCRegistry)
 4. Implementasi Web3j di BlockchainService (anchor + verify real)
@@ -136,10 +171,12 @@ src/
 6. Set app.blockchain.simulation=false
 ```
 
-### Sprint 6 ⬜ — Testing
+### Sprint 6 ⬜ — Implementasi Web3j Real & Controller Tests
 ```
-7. Unit test service-service kritis
-8. Integration test controller
+3. Deploy smart contracts ke testnet (GiziChainRegistry + VCRegistry)
+4. Implementasi Web3j di BlockchainService (anchor + verify real)
+5. Implementasi Web3j di VcService (issue/revoke real)
+6. Integration test controller
 ```
 
 ---
