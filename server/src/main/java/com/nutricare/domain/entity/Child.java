@@ -1,6 +1,8 @@
 package com.nutricare.domain.entity;
 
 import com.nutricare.domain.enums.Gender;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
@@ -44,7 +46,8 @@ public class Child {
     private LocalDate birthDate;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "gender_enum")
+    @JdbcTypeCode(SqlTypes.VARCHAR)
+    @Column(nullable = false)
     private Gender gender;
 
     // ID anonim untuk keperluan on-chain (menggantikan nama/PII)

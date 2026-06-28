@@ -1,6 +1,8 @@
 package com.nutricare.domain.entity;
 
 import com.nutricare.domain.enums.AnchorStatus;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
@@ -60,8 +62,8 @@ public class BlockchainAnchor {
     private String contractAddress;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "anchor_status", nullable = false,
-            columnDefinition = "anchor_status_enum")
+    @JdbcTypeCode(SqlTypes.VARCHAR)
+    @Column(name = "anchor_status", nullable = false)
     @Builder.Default
     private AnchorStatus anchorStatus = AnchorStatus.PENDING;
 

@@ -1,6 +1,8 @@
 package com.nutricare.domain.entity;
 
 import com.nutricare.domain.enums.VcType;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
@@ -54,7 +56,8 @@ public class VerifiableCredential {
     // ── DATA CREDENTIAL ───────────────────────────────────────────────────────
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "vc_type", nullable = false, columnDefinition = "vc_type_enum")
+    @JdbcTypeCode(SqlTypes.VARCHAR)
+    @Column(name = "vc_type", nullable = false)
     private VcType vcType;
 
     // Content Identifier dokumen VC di IPFS (via Pinata)

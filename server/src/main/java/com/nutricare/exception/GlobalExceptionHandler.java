@@ -10,6 +10,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import lombok.extern.slf4j.Slf4j;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,6 +20,7 @@ import java.util.Map;
  * { status, error, message, timestamp, path }
  */
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -86,6 +88,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGeneric(
             Exception ex, HttpServletRequest req) {
+        log.error("Unhandled exception at {}: ", req.getRequestURI(), ex);
         return buildError(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_ERROR",
             "Terjadi kesalahan server. Silakan coba lagi.", req.getRequestURI());
     }
