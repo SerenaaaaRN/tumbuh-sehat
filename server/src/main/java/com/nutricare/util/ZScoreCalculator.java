@@ -70,10 +70,10 @@ public class ZScoreCalculator {
      */
     public StuntStatus determineStuntStatus(BigDecimal zscoreHa) {
         double z = zscoreHa.doubleValue();
-        if (z < -3.0)       return StuntStatus.SEVERELY_STUNTED;
-        if (z < -2.0)       return StuntStatus.STUNTED;
-        if (z < -2.5)       return StuntStatus.AT_RISK; // -2.0 s/d -2.5
-        return StuntStatus.NORMAL;
+        if (z < -3.0)               return StuntStatus.SEVERELY_STUNTED;
+        if (z < -2.5)               return StuntStatus.STUNTED;     // [-3.0, -2.5)
+        if (z < -2.0)               return StuntStatus.AT_RISK;     // [-2.5, -2.0)
+        return StuntStatus.NORMAL;                                  // >= -2.0
     }
 
     /**

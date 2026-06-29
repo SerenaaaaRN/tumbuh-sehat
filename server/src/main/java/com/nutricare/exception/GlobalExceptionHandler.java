@@ -3,12 +3,14 @@ package com.nutricare.exception;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import lombok.extern.slf4j.Slf4j;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +20,7 @@ import java.util.Map;
  * { status, error, message, timestamp, path }
  */
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -55,6 +58,12 @@ public class GlobalExceptionHandler {
         return buildError(HttpStatus.FORBIDDEN, "FORBIDDEN", ex.getMessage(), req.getRequestURI());
     }
 
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Map<String, Object>> handleAccessDenied(
+            AccessDeniedException ex, HttpServletRequest req) {
+        return buildError(HttpStatus.FORBIDDEN, "ACCESS_DENIED", "Akses ditolak: role tidak sesuai.", req.getRequestURI());
+    }
+
     @ExceptionHandler(GeminiException.class)
     public ResponseEntity<Map<String, Object>> handleGemini(
             GeminiException ex, HttpServletRequest req) {
@@ -79,6 +88,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGeneric(
             Exception ex, HttpServletRequest req) {
+        log.error("Unhandled exception at {}: ", req.getRequestURI(), ex);
         return buildError(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_ERROR",
             "Terjadi kesalahan server. Silakan coba lagi.", req.getRequestURI());
     }

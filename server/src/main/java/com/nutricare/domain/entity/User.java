@@ -11,6 +11,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.nutricare.domain.enums.Role;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -46,7 +48,8 @@ public class User implements UserDetails {
     private String name;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "role_enum")
+    @JdbcTypeCode(SqlTypes.VARCHAR)
+    @Column(nullable = false)
     @Builder.Default
     private Role role = Role.PARENT;
 

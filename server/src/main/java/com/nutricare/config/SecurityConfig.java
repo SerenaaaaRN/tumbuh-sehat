@@ -53,8 +53,9 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .authorizeHttpRequests(auth -> auth
                 // Public endpoints
-                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/auth/register", "/api/auth/login", "/api/auth/refresh", "/api/auth/logout").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/verify").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/vc/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/blockchain/verify/**").permitAll()
                 // Semua lain wajib auth
                 .anyRequest().authenticated()

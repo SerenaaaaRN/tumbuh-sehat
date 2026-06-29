@@ -51,12 +51,13 @@ public class Prediction {
     // ── HASIL PREDIKSI ────────────────────────────────────────────────────────
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "stunt_status_enum")
+    @JdbcTypeCode(SqlTypes.VARCHAR)
+    @Column(nullable = false)
     private StuntStatus status;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "prediction_status", nullable = false,
-            columnDefinition = "prediction_status_enum")
+    @JdbcTypeCode(SqlTypes.VARCHAR)
+    @Column(name = "prediction_status", nullable = false)
     @Builder.Default
     private PredictionStatus predictionStatus = PredictionStatus.PENDING;
 

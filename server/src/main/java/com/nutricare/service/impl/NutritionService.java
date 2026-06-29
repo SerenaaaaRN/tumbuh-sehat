@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nutricare.domain.entity.Child;
 import com.nutricare.domain.entity.NutritionLog;
 import com.nutricare.dto.response.nutrition.NutritionResponse;
+import com.nutricare.dto.response.PageResponse;
+import com.nutricare.domain.enums.Role;
 import com.nutricare.exception.ForbiddenException;
 import com.nutricare.exception.ResourceNotFoundException;
 import com.nutricare.exception.StorageException;
@@ -14,7 +16,6 @@ import com.nutricare.repository.NutritionLogRepository;
 import com.nutricare.util.CuidGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -103,12 +104,39 @@ public class NutritionService {
      * @param pageable parameter pagination
      * @return halaman riwayat log gizi
      */
-    public Page<NutritionResponse> getNutritionHistory(String childId, String userId, Pageable pageable) {
+    public PageResponse<NutritionResponse> getNutritionHistory(String childId, String userId, Pageable pageable) {
         childRepository.findByIdAndUserId(childId, userId)
             .orElseThrow(() -> new ForbiddenException("Anak tidak ditemukan atau bukan milik Anda"));
 
-        return nutritionLogRepository.findByChildIdOrderByCreatedAtDesc(childId, pageable)
-            .map(this::mapToResponse);
+        org.springframework.data.domain.Page<com.nutricare.domain.entity.NutritionLog> pageResult = nutritionLogRepository.findByChildIdOrderByCreatedAtDesc(childId, pageable);
+
+        return PageResponse.<NutritionResponse>builder()
+            .data(pageResult.stream().map(this::mapToResponse).toList())
+            .page(pageResult.getNumber())
+            .size(pageResult.getSize())
+            .totalElements(pageResult.getTotalElements())
+            .totalPages(pageResult.getTotalPages())
+            .build();
+    }
+
+    /**
+     * Menghapus log gizi.
+     * Ownership: PARENT hanya bisa hapus milik sendiri, MEDIC/ADMIN bisa semua.
+     *
+     * @param logId ID log gizi
+     * @param userId ID user yang meminta
+     * @param role Role user yang meminta
+     */
+    @Transactional
+    public void deleteNutritionLog(String logId, String userId, Role role) {
+        NutritionLog log = nutritionLogRepository.findById(logId)
+            .orElseThrow(() -> new ResourceNotFoundException("Log gizi tidak ditemukan"));
+
+        if (role == Role.PARENT && !log.getChild().getUser().getId().equals(userId)) {
+            throw new ForbiddenException("Anda tidak memiliki akses ke data ini");
+        }
+
+        nutritionLogRepository.delete(log);
     }
 
     /**
