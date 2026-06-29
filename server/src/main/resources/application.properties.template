@@ -1,0 +1,79 @@
+# =============================================
+# APPLICATION CONFIG
+# =============================================
+spring.application.name=nutricare
+server.port=8080
+
+# =============================================
+# DATABASE - Supabase PostgreSQL
+# =============================================
+spring.datasource.url=jdbc:postgresql://db.your-project-ref.supabase.co:5432/postgres
+spring.datasource.username=postgres
+spring.datasource.password=your-db-password
+spring.datasource.driver-class-name=org.postgresql.Driver
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=false
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+spring.jpa.properties.hibernate.format_sql=true
+spring.datasource.hikari.connection-timeout=10000
+spring.datasource.hikari.maximum-pool-size=5
+
+# =============================================
+# JWT
+# =============================================
+app.jwt.secret=your-jwt-secret-base64
+app.jwt.refresh-secret=your-jwt-refresh-secret-base64
+app.jwt.access-expiration=900000
+app.jwt.refresh-expiration=604800000
+
+# =============================================
+# GEMINI AI
+# =============================================
+gemini.api.key=your-gemini-api-key
+gemini.api.url-text=https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent
+gemini.api.url-vision=https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent
+
+# =============================================
+# SUPABASE STORAGE
+# =============================================
+supabase.url=https://your-project-ref.supabase.co
+supabase.service-key=your-service-role-key
+supabase.bucket=food-photos
+
+# =============================================
+# CORS
+# =============================================
+app.cors.allowed-origins=http://localhost:3000,http://localhost:8081
+
+# =============================================
+# MULTIPART - File Upload
+# =============================================
+spring.servlet.multipart.max-file-size=5MB
+spring.servlet.multipart.max-request-size=5MB
+
+# =============================================
+# ASYNC & SCHEDULING
+# =============================================
+spring.task.execution.pool.core-size=4
+spring.task.execution.pool.max-size=8
+spring.task.scheduling.pool.size=2
+
+# =============================================
+# BLOCKCHAIN - Polygon
+# =============================================
+app.blockchain.simulation=true
+polygon.rpc-url=https://rpc-mumbai.maticvigil.com
+polygon.chain-id=80001
+polygon.contracts.gizi-chain-registry=0x0000000000000000000000000000000000000000
+polygon.contracts.vc-registry=0x0000000000000000000000000000000000000000
+polygon.wallet.address=0x0000000000000000000000000000000000000000
+polygon.private-key=your-polygon-private-key
+
+# =============================================
+# PINATA - IPFS
+# =============================================
+pinata.api-key=your-pinata-api-key
+pinata.secret-key=your-pinata-secret-key
+pinata.jwt=your-pinata-jwt
+pinata.gateway=https://gateway.pinata.cloud/ipfs
+pinata.pin-url=https://api.pinata.cloud/pinning/pinJSONToIPFS
